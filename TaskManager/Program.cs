@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using TaskManager.BusinessLogic;
 using Task = TaskManager.BusinessLogic.Task;
 using TaskStatus = TaskManager.BusinessLogic.TaskStatus;
@@ -223,10 +224,11 @@ namespace TaskManager
                 return;
             }
 
-            if (_taskManagerService.Get(taskId) != null)
+            var task = _taskManagerService.Get(taskId);
+            if (task != null)
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(_taskManagerService.Get(taskId));
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                DetailedInfo(task);
                 Console.ResetColor();
             }
             else
@@ -292,6 +294,27 @@ namespace TaskManager
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Dodano zadanie {task}");
             Console.ResetColor();
+        }
+
+        private static void DetailedInfo(Task task)
+        {
+            var sb = new StringBuilder();
+            sb.Append($"ID: {task.Id}, opis: {task.Description}, data utworzenia: {task.CreationDate}, status: {task.Status}");
+            if (task.DueDate.HasValue)
+            {
+                sb.Append($", data do której należy ukończyć: {task.DueDate}");
+            }
+
+            if (task.StartDate.HasValue)
+            {
+                sb.Append($", data rozpoczęcia: {task.StartDate}");
+            }
+
+            if (task.DoneDate.HasValue)
+            {
+                sb.Append($", data ukończenia: {task.DoneDate}. Łącznie zadanie zajęło: {task.Duration}.");
+            }
+            Console.WriteLine(sb);
         }
     }
 }
